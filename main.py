@@ -1,31 +1,30 @@
-from random import choice, randint
+import hashlib
 
-alphabet_min = [ chr(i) for i in range(97,123) ]
-alphabet_maj = [ chr(i) for i in range(65,91) ]
-chiffres = [ chr(i) for i in range(48,58) ]
-caracteres_speciaux = [ '%' , '_' , '-' , '!' , '$' , '^' , '&' , '#' , '(' , ')' , '[' , ']' , '=' , '@']
-
-def pwd(n , min = True, maj = True, chif = True, cs = True):
-    alphabets = dict()
-    key = 0
-    if min:
-        alphabets[key] = alphabet_min
-        key += 1
-    if maj:
-        alphabets[key] = alphabet_maj
-        key += 1
-    if chif:
-        alphabets[key] = chiffres
-        key += 1
-    if cs:
-        alphabets[key] = caracteres_speciaux
-        key += 1
+def check_password_requirements(password):
+    length_req = len(password) >= 8
+    uppercase_req = any(char.isupper() for char in password)
+    lowercase_req = any(char.islower() for char in password)
+    digit_req = any(char.isdigit() for char in password)
+    special_char_req = any(char in '!@#$%^&*' for char in password)
     
-    mdp = ''
-    for i in range(n):
-            s = randint(0,key-1)
-            mdp += choice( alphabets[s] )
-            
-    return mdp
+    return length_req and uppercase_req and lowercase_req and digit_req and special_char_req
 
-print(pwd(10, min = True, maj = True, chif = True, cs = True))
+def hash_password(password):
+    hash_object = hashlib.sha256(password.encode())
+    hashed_password = hash_object.hexdigest()
+    return hashed_password
+
+def main():
+    while True:
+        user_password = input("Veuillez choisir un mot de passe : ")
+
+        if check_password_requirements(user_password):
+            hashed_password = hash_password(user_password)
+            print(f"Le mot de passe haché (SHA-256) est : {hashed_password}")
+            print("Le mot de passe respecte les exigences de sécurité.")
+            break
+        else:
+            print("Le mot de passe ne respecte pas les exigences de sécurité. Veuillez réessayer.")
+
+if __name__ == "__main__":
+    main()
